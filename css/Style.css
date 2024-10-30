@@ -1,0 +1,184 @@
+:root{
+    --main-DarkGreen-Color: #065734;
+    --secundary-LightGreen-color: #00953A;
+    --Gold-color: #D4AF37;
+    --waite-color:linear-gradient(to right,#D6D6D6 0%, #FFFFFF 51%, #f3f3f3 75%);
+    --ProGreen-color:linear-gradient(131deg, rgba(8,212,87,1) 1%, rgba(6,87,52,1) 49%, rgba(3,38,23,1) 96%);
+    --shadow-prime:10px 6px 6px 0px  #0657343e;
+}
+
+/* font */
+@font-face {
+    font-family: 'mainfont';
+    src: url('../css/Font/pointart-sans-serif-Bold.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    direction: rtl;
+    font-family:"mainfont";
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.topNav{
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    height: 30px;
+    background-color: var(--main-DarkGreen-Color);
+    padding: 5px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.topNav a{
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.topNav a svg{
+    margin-left: 10px;
+}
+
+.autheratypage{
+    height: fit-content;
+    width: fit-content;
+    margin-right: 5px;
+}
+
+.topNav .socialMedia{
+    height: fit-content;
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    left:0 ;
+    margin-left: 10px;
+}
+
+nav{
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.Navheader{
+    overflow: hidden;
+    width: 100%;
+}
+.Navheader::before {
+    position: absolute;
+    content: " ";
+    display: block;
+    width: 102%;
+    top: -20px;
+    right: -30px;
+    transform: rotate(3deg);
+    transform-origin: center;
+    background: var(--waite-color);
+    height:200px;
+    z-index: 4;
+    padding: 0;
+    margin: 0 auto;
+    box-sizing: content-box;
+}
+
+
+
+.infocontainer{
+    z-index: 5;
+    width: fit-content;
+}
+
+.logos img {
+    z-index: 5;
+    position:relative ;
+}
+
+.logos{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: fit-content;
+    position: relative;
+    top: 20px;
+    margin-left:  30px; 
+    right: 40px;
+}
+
+.PlatformLogo img{
+    width: 120px;
+    margin-left:10px; ;
+}
+
+.visionLogo img{
+    width: 110px;
+}
+
+.PlatformLogo::after{
+    content: " ";
+    height: 100px;
+    border-radius: 8px;
+    width: 3px;
+    background-color: #065734;
+    display: inline-block;
+    z-index: 5;
+    position: relative;
+    top: -10px;
+    margin-left: 20px;
+}
+
+.mainnav{
+    background: rgb(8,212,87);
+    background: var(--ProGreen-color);
+    position: relative;
+    right: 50%;
+    bottom: 45px;
+    z-index: 3;
+    width: fit-content;
+    height: 100px;
+    text-align:center;
+    border-radius: 20px;
+    border-top-left-radius:0px ;
+
+}
+
+.mainnav .Navitems{
+    position: relative;
+    top: 45px;
+    list-style-type: none;
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+}
+
+.NavLink {
+    color: white;
+    margin: 15px;
+    font-size: 24px;
+    text-decoration: none;
+}
+
+
+.welcomeMessage{
+    background-color: rgba(152, 151, 151, 0.552);
+    width: 350px;
+    border-radius: 20px;
+    text-align: center;
+    padding: 5px;
+    z-index: 5;
+    position: absolute;
+    left: 15%;
+    top:10%;
+}  
