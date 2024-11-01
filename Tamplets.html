@@ -6,10 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/Style.css">
     <title>tmaplet</title>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
+            navitems
+            document.getElementById('navitems').classList.toggle('active');
+
+
+        }
+    </script>
 </head>
 
 <body>
-    <div class="topNav">
+   
+    <nav> 
+        <div class="topNav">
         <div class="autheratypage">
             <a href="">
                 <svg width="20px" height="20px" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -71,7 +83,6 @@
             </a>
         </div>
     </div>
-    <nav>
         <div class="Navheader">
 
         </div>
@@ -79,10 +90,10 @@
         <div class="infocontainer">
             <div class="logos">
                 <div class="PlatformLogo">
-                    <img src="media/logo/922 logo.png" alt="922login">
+                    <img src="css/media/logo/922 logo.png" alt="922login">
                 </div>
                 <div class="visionLogo">
-                    <img src="media/logo/Saudi_Vision_2030_logo.svg.png" alt="visionLogo">
+                    <img src="css/media/logo/Saudi_Vision_2030_logo.svg.png" alt="visionLogo">
                 </div>
 
 
@@ -92,25 +103,16 @@
                 مرحبًا لمى !
             </div>
         </div>
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
 
-        <div class="mainnav">
-            <ul class="Navitems">
-                <li>
+        <div class="mainnav" id="navLinks">
+            <div class="Navitems" id="navitems">
                     <a href="" class="NavLink"> الرئيسية</a>
-                </li>
-                <li>
                     <a href="" class="NavLink">الخدمات الإلكترونية </a>
-                </li>
-                <li>
                     <a href="" class="NavLink">حسابي </a>
-                </li>
-                <li>
                     <a href="" class="NavLink">تذاكري </a>
-                </li>
-                <li>
                     <a href="" class="NavLink">خروج </a>
-                </li>
-            </ul>
+                
         </div>
     </nav>
 </body>

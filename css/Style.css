@@ -16,17 +16,17 @@
 }
 
 
-* {
+/* * {
     box-sizing: border-box;
-}
+} */
 
 body {
     direction: rtl;
     font-family:"mainfont";
     padding: 0;
     margin: 0;
-    height: 100%;
     overflow: hidden;
+    height: max-content;
 }
 
 .topNav{
@@ -182,3 +182,84 @@ nav{
     left: 15%;
     top:10%;
 }  
+
+.hamburger {
+    display: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .mainnav, .Navitems {
+        display: none;
+        /* flex-direction: column;
+        gap: 0; */
+        width: 100%;
+        /* position: absolute; */
+        /* top: 60px;
+        left: 0;
+        padding: 1rem; */
+    }
+
+    .Navitems{
+        
+        display: flex;
+        flex-direction: column;
+
+    }
+
+    .NavLink a {
+        padding: 0.75rem 0;
+        text-align: center;
+        width: 100%;
+    }
+
+    .mainnav.active, .Navitems.active {
+        display: flex;
+        position: relative;
+        top: 45px;
+        list-style-type: none;
+        right: 0;
+        flex-direction: column;
+        margin-left: 10px;
+        align-items: center;
+        height: fit-content;
+    }
+
+    .hamburger {
+        display: block;
+        z-index: 6;
+        position: absolute;
+        left: 5%;
+        top: 10%;
+    }
+
+    .Navheader::before{
+        transform: rotate(0deg);
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        right: 0;
+        height: 20%;
+    }
+
+    .logos .PlatformLogo img{
+        width: 64px;
+        height: inherit;
+    }
+
+    .logos .visionLogo img{
+        width: 54px;
+    }
+
+    .PlatformLogo::after{
+        height: 50px;
+    }
+
+    .welcomeMessage{
+        width: 100px;
+    }
+    .topNav{
+        height: inherit;
+    }
+}
