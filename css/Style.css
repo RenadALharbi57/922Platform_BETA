@@ -2,7 +2,7 @@
     --main-DarkGreen-Color: #065734;
     --secundary-LightGreen-color: #00953A;
     --Gold-color: #D4AF37;
-    --waite-color:linear-gradient(to right,#D6D6D6 0%, #FFFFFF 51%, #f3f3f3 75%);
+    --waite-color:linear-gradient(131deg, #D6D6D6 1%, #FFFFFF 49%, #f3f3f3 96%);
     --ProGreen-color:linear-gradient(131deg, rgba(8,212,87,1) 1%, rgba(6,87,52,1) 49%, rgba(3,38,23,1) 96%);
     --shadow-prime:10px 6px 6px 0px  #0657343e;
 }
@@ -20,12 +20,14 @@
     box-sizing: border-box;
 } */
 
+
 body {
     direction: rtl;
     font-family:"mainfont";
     padding: 0;
     margin: 0;
     overflow: hidden;
+    overflow-y: scroll;
     height: max-content;
 }
 
@@ -65,6 +67,7 @@ body {
     flex-direction: row;
     position: absolute;
     left:0 ;
+    gap: 20px;
     margin-left: 10px;
 }
 
@@ -128,9 +131,9 @@ nav{
 
 .PlatformLogo::after{
     content: " ";
-    height: 100px;
+    height: 110px;
     border-radius: 8px;
-    width: 3px;
+    width: 2px;
     background-color: #065734;
     display: inline-block;
     z-index: 5;
@@ -156,7 +159,7 @@ nav{
 
 .mainnav .Navitems{
     position: relative;
-    top: 45px;
+    top: 40px;
     list-style-type: none;
     display: flex;
     flex-direction: row;
@@ -168,6 +171,7 @@ nav{
     margin: 15px;
     font-size: 24px;
     text-decoration: none;
+    transform: scale(1);
 }
 
 
@@ -189,31 +193,52 @@ nav{
     cursor: pointer;
 }
 
+.Navitems  a:hover::after{
+    content: " ";
+    height: 3px;
+    width: 100%;
+    margin-top: 4px;
+    display: block;
+    background-color: #FFFFFF;
+    position: relative;
+    z-index: 6;
+    animation: customAni1 0.5s ease 0s 1 normal none;
+}
+
+@keyframes customAni1 {
+    0%{
+        transform: scaleX(0.0);
+        transform-origin: 0% 100%;
+    }
+
+    100%{
+        transform: scaleX(1);
+        transform-origin: 0% 100%;
+    }
+}
+
+
 @media (max-width: 768px) {
     .mainnav, .Navitems {
         display: none;
-        /* flex-direction: column;
-        gap: 0; */
         width: 100%;
-        /* position: absolute; */
-        /* top: 60px;
-        left: 0;
-        padding: 1rem; */
+        font-size: 12px;
     }
 
-    .Navitems{
-        
-        display: flex;
-        flex-direction: column;
-
+    .mainnav{
+    padding-bottom: 20px;
+    border-top-right-radius:0 ;
     }
+
 
     .NavLink a {
         padding: 0.75rem 0;
         text-align: center;
         width: 100%;
+
     }
 
+    
     .mainnav.active, .Navitems.active {
         display: flex;
         position: relative;
@@ -223,7 +248,39 @@ nav{
         flex-direction: column;
         margin-left: 10px;
         align-items: center;
-        height: fit-content;
+    }
+
+    .Navitems.active  a{
+        font-size: 18px;
+    }
+
+    .Navitems.active  a:hover::after{
+        content: " ";
+        height: 3px;
+        width: 100%;
+        margin-top: 4px;
+        display: block;
+        background-color: #FFFFFF;
+        position: relative;
+        z-index: 6;
+        animation: customAni1 0.5s ease 0s 1 normal none;
+    }
+
+    @keyframes customAni1 {
+        0%{
+            transform: scaleX(0.0);
+            transform-origin: 0% 100%;
+        }
+
+        100%{
+            transform: scaleX(1);
+            transform-origin: 0% 100%;
+        }
+    }
+
+    .mainnav.active{
+        height: 400px;
+        top: 20px;
     }
 
     .hamburger {
@@ -231,7 +288,10 @@ nav{
         z-index: 6;
         position: absolute;
         left: 5%;
-        top: 10%;
+        top: 70px;
+        height: 29.2px;
+        padding: 0;
+        margin: 0;
     }
 
     .Navheader::before{
@@ -240,12 +300,14 @@ nav{
         margin: 0;
         width: 100%;
         right: 0;
-        height: 20%;
+        height: 18%;
     }
-
+    .logos{
+        right: 15px;
+    }
     .logos .PlatformLogo img{
-        width: 64px;
-        height: inherit;
+        width: 60px;
+        padding-bottom: 10px;
     }
 
     .logos .visionLogo img{
@@ -257,9 +319,20 @@ nav{
     }
 
     .welcomeMessage{
+        top: 8.5%;
         width: 100px;
+        font-size: 12px;
     }
     .topNav{
-        height: inherit;
+        height: 5%;
+        font-size: 16px;
+    }
+    .topNav .socialMedia{
+        gap: 5px;
+    }
+
+
+    .topNav svg{
+        width: 16px;  
     }
 }
