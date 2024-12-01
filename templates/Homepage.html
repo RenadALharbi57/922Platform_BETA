@@ -1,0 +1,162 @@
+
+{% extends 'base.html' %}
+
+    {% block content %}
+
+ 
+<main class="container">
+
+            <section class="white-sect"> 
+            </section>
+    
+            <section class="mowaten">
+                <img src="../static/css/media/header.jpeg">
+                <h1 class="mowaten-heading">المواطن عين الوطن وخط الدفاع الأول</h1>
+            </section>
+    
+            <section class="gray-line">
+    
+            </section>
+    
+            <section class="services-sect">
+                <div class="electro-sevice">
+                    <span>الخدمات الإلكترونية</span>
+                </div>
+                <div class="services">
+                    <div class="service"><a href="{{ url_for('fileticketPage') }}"><img src="../static/css/media/icons/service1.png" alt="تذكرة جديدة"></a>
+                        <span> تذكرة جديدة </span> 
+                    </div>
+                    <div class="service"><a href="{{url_for('track_ticket')}}"><img src="../static/css/media/icons/service2.png" alt="تتبع"></a>
+                        <span> تتبع التذاكر </span> 
+                    </div>
+                    <div class="service"><a href=""><img src="../static/css/media/icons/service3.png" alt="خدمات"></a>
+                        <span> تقيم الخدمات </span> 
+                    </div>
+                </div>
+            </section>
+            
+            <section class="feature">
+                <div class="why">
+                    <span>لماذا منصة 922</span>
+                </div>
+    
+                <div class="feature-cards">
+                    <div class="card">
+                        <h2>تواصل موحد</h2>
+                        <img src="../static/css/media/icons/connect.png" alt="">
+                        <p>
+                            لا حاجة للبحث عن تطبيقات أو أرقام هواتف مختلفة.
+                             يمكنك تقديم جميع الشكاوى غير
+                              الطارئة عبر منصة واحدة
+                        </p>
+                    </div>
+    
+                    <div class="card">
+                        <h2>أمان البيانات</h2>
+                        <img src="../static/css/media/icons/lock.png" alt="">
+                        <p>
+                            بياناتك الشخصية هي أولويتنا.
+                            تم تصميم منصتنا لحماية المستخدمين من
+                            تسريبات البيانات وضمان السرية.
+                        </p>
+                    </div>
+    
+                    <div class="card">
+                        <h2>كفاءة</h2>
+                        <img src="../static/css/media/icons/efficiency.png" alt="">
+                        <p>
+                            باستخدام تقنيات الذكاء الاصطناعي 
+                            والتعلم الآلي ومعالجة اللغة الطبيعية،
+                             نقوم بتصنيف الشكاوى بناءً على الأولوية وتوجيهها 
+                             إلى الجهات المعنية بكفاءة.
+                        </p>
+                    </div>
+    
+                    <div class="card">
+                        <h2>سهولة الإستخدام</h2>
+                        <img src="../static/css/media/icons/easy.png" alt="">
+                        <p>
+                            توفر منصتنا تجربة مستخدم بسيطة 
+                            وتركز على تسهيل عملية تقديم الشكاوى
+                        </p>
+                    </div>
+                </div>
+            </section>
+    
+            <section class="q-a">
+                <div class="q-a-heading">
+                    <h2>الأسئلة الشائعة </h2>
+                    <img src="../static/css/media/icons/qa.png" alt="الشائعة">
+                </div>
+    
+                <div class="q-a-body" >
+                    <ol>
+                        <li onclick="toggleAnswer(this)">
+                            كيف يمكنني تقديم شكوى عبر المنصة؟ 
+                            <p class="answer hide">
+                                يمكنك تقديم شكوى عبر:<br>
+                                التطبيق الإلكتروني: تنزيل التطبيق الرسمي للمنصة على هاتفك المحمول.
+                                الاتصال بالرقم الموحد: الاتصال برقم 922 لتقديم الشكاوى عبر الهاتف.
+                            </p>
+                        </li>
+                        <li onclick="toggleAnswer(this)">
+                            هل يمكنني تقديم شكاوى لجميع الجهات الحكومية عبر هذه المنصة؟
+                            <p class="answer hide">
+                                نعم، المنصة مصممة لتغطي جميع الجهات الحكومية المعنية بالشكاوى غير الطارئة، حيث يتم توجيه الشكاوى إلى الجهة المختصة بشكل مباشر.
+                            </p>
+                        </li>
+                        <li onclick="toggleAnswer(this)">
+                            هل يتم الحفاظ على سرية بياناتي الشخصية؟
+                            <p class="answer hide">
+                                المنصة تضع أمان وسرية بيانات المستخدمين كأولوية، مع تقنيات حماية متقدمة لضمان عدم تسريب أو مشاركة البيانات بدون إذن.
+                            </p>
+                        </li>
+                        <li onclick="toggleAnswer(this)">
+                            كيف يساعد الذكاء الاصطناعي في تحسين عملية تقديم الشكاوى؟
+                            <p class="answer hide"> 
+                                يستخدم الذكاء الاصطناعي لتصنيف الشكاوى بناءً على أولويتها وتوجيهها تلقائيًا إلى الجهة المختصة، مما يسرع من عملية الاستجابة ويضمن معالجة فعّالة للشكاوى.                        </p>
+                        </li>
+                        <li onclick="toggleAnswer(this)">
+                            ما الفرق بين الشكاوى التي تُقدم عبر المنصة والشكاوى الطارئة؟
+                            <p class="answer hide"> 
+                                المنصة مخصصة للشكاوى غير الطارئة. أما الحالات الطارئة، فيجب تقديمها عبر الرقم الموحد للطوارئ 911 ليتم التعامل معها بتركيز وسرعة أكبر.                        </p>
+                        </li>
+                        <li onclick="toggleAnswer(this)">
+                            هل يمكنني متابعة حالة الشكوى بعد تقديمها؟
+                            <p class="answer hide">
+                                نعم، يمكنك متابعة حالة الشكوى من خلال  الموقع الإلكتروني، حيث توفر المنصة تحديثات مستمرة بشأن حالة الشكوى ومراحل معالجتها.                             </p>
+                        </li>
+                        <li onclick="toggleAnswer(this)">
+                            ما هي الجهات الحكومية التي تدعم هذه المنصة؟
+                            <p class="answer hide"> 
+    
+                                تم تغطية (وزراة الشؤون البلدية والقروية ، ساما، وزارة التجاره، وزارة النقل) وسوف تشمل المنصة جميع الوزارات والجهات الحكومية ذات الصلة التي تستقبل شكاوى المواطنين، في المرحلة القادمه.                        </p>
+                        </li>
+                        <li onclick="toggleAnswer(this)">
+                            هل يمكنني تقديم الشكاوى بشكل مجهول؟
+                            <p class="answer hide">
+                                لا، حيث ان لابد من الوصول اليك لمعالجة شكواك بشكل فعال                        </p>
+                        </li>
+                    </ol>
+                </div>
+    
+                <div class="gray-div">
+    
+                </div>
+            </section>
+    
+        </main>
+        
+
+    {% endblock content %}
+    
+    <!-- footer -->
+    <footer>
+        <section class="green-footer">
+    
+        </section>
+    
+        <section class="overlay-footer">
+    
+        </section> 
+     </footer>

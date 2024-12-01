@@ -1,0 +1,234 @@
+
+{% extends 'base.html' %}
+    
+{% block content %}
+ 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="alert-messages" id="error-message">
+    {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+
+    <div id="error-message" class="error-message" style="display: none;">
+    </div>
+
+    <div  id="overlayBackground"class="mainbody overlay-background">
+    <div class="fileticketform">
+        <div class="headerservic"> تذكرة جديدة </div>
+    <!-- القسم الأول: البيانات الأساسية -->
+    <div class="section-title">البيانات الأساسية</div>
+
+    <div class="form-container">
+        <!-- السطر الأول: الاسم الأول والاسم الأخير -->
+        <div class="form-row">
+            <div class="input-group">
+                <label class="field-label" for="first-name">الاسم الأول</label>
+                <input type="text" class="input-box" name="first_name" value="{{ user_data.first_name }}" readonly>
+            </div>
+            <div class="input-group">
+                <label class="field-label" for="last-name">الاسم الأخير</label>
+                <input type="text" name="last_name" class="input-box" value="{{ user_data.last_name }}" readonly>
+
+            </div>
+        </div>
+
+        <!-- السطر الثاني: رقم الهوية -->
+        <div class="form-row">
+            <div class="input-group">
+                <label class="field-label" for="id-number">رقم الهوية</label>
+                <input type="text" name="id_number" class="input-box"  value="{{ user_data.id_number }}" readonly>
+            </div>
+        </div>
+    </div>
+
+    <!-- القسم الثاني: بيانات التواصل -->
+    <div class="section-title">بيانات التواصل</div>
+
+    <div class="form-container">
+        <!--  الإيميل ورقم الجوال -->
+        <div class="form-row">
+            <div class="input-group">
+                <label class="field-label" for="email">الإيميل</label>
+                <input type="email" id="email" class="input-box">
+            </div>
+            <div class="input-group">
+                <label class="field-label" for="phone">رقم الجوال</label>
+                <input type="text" id="phone" name="mobile_number" class="input-box" value="{{ user_data.mobile_number }}" >
+            </div>
+        </div>
+    </div>
+
+
+    <!-- القسم الثالث: العنوان -->
+    <div class="section-title">العنوان</div>
+
+    <div class="form-container">
+        <!--  المنطقة والمدينة -->
+        <div class="form-row">
+            <div class="input-group">
+                <label class="field-label" for="region">المنطقة</label>
+                <select id="region" class="input-box" onchange="updateCities()">
+                    <option value="">اختر المنطقة</option>
+                    <option value="مكة">مكة</option>
+                    <option value="الرياض">الرياض</option>
+                    <option value="الشرقية">الشرقية</option>
+                    <option value="عسير">عسير</option>
+                    <option value="تبوك">تبوك</option>
+                    <option value="حائل">حائل</option>
+                    <option value="الحدود الشمالية">الحدود الشمالية</option>
+                    <option value="جازان">جازان</option>
+                    <option value="الباحة">الباحة</option>
+                    <option value="المدينة المنورة">المدينة المنورة</option>
+                    <option value="الجوف">الجوف</option>
+                    <option value="نجران">نجران</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label class="field-label" for="city">المدينة</label>
+                <select id="city" class="input-box">
+                    <option value="">اختر المدينة</option>
+                    <!-- سيتم ملء المدن ديناميكياً بناءً على المنطقة المختارة -->
+                </select>
+            </div>
+        </div>
+    </div>
+
+<!-- القسم الرابع -->
+<h2 class="section-title">بيانات التذكرة</h2>
+<div class="form-row">
+    <textarea class="ticket-text" id="complaint" placeholder="اكتب نص التذكرة هنا..."></textarea>
+    <div class="upload-box">
+        <div class="upload-area">
+            <span class="upload-icon">📎</span>
+            <span class="upload-text">انقر لإرفاق الملفات</span>
+            <input type="file" class="upload-input" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" onchange="displayFileNames(event)"">
+        </div>
+    </div>
+</div>
+
+<div id="file-list" class="file-list"></div>
+<!-- القسم الخامس - زر رفع التذكرة -->
+<div class="form-section">
+    <button class="submit-button" onclick="submitComplaint()">رفع التذكرة</button>
+</div>
+
+</div>
+
+</div>
+
+    </div> 
+    <div id="cont">
+        
+
+    </div>
+    <script>
+
+        
+        async function submitComplaint() {
+            const complaintText = document.getElementById('complaint').value;
+            const emailValue = document.getElementById('email').value;
+            const PhoneValue = document.getElementById('phone').value;
+        
+            console.log("Data being sent:", { complaintText, emailValue, PhoneValue });
+        
+            if (!complaintText || !emailValue || !PhoneValue) {
+                alert("يرجى تعبئة جميع الحقول المطلوبة");
+                return;
+            }
+        
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        complaint: complaintText,
+                        email: emailValue,
+                        phone: PhoneValue
+                    })
+                });
+        
+                const result = await response.json();
+        
+                if (response.ok) {
+                    // عرض النتائج
+                    const  resultContainer = document.getElementById('cont');
+                    resultContainer.innerHTML = `<div id="result">
+                        
+                        <div id="HeaderResult">
+                            <i>مرحبا 
+                            {{ user_data.first_name }}
+                            {{ user_data.last_name }}
+                            </i>
+                            تفاصيل تذكرتك كما هو موضح بالاسفل
+                        </div>
+                        <div id="AuthResult">
+                            <i>الجهة المختصة:</i>
+                            ${result.authority}
+                        </div>
+                         <div id="DepartmentResult">
+                            <i>الإختصاص:</i>
+                            ${result.specialization}
+                        </div>
+                        <div id="SeverityResult">
+                            <i>الأهمية:</i>
+                            ${result.severity}
+                        </div>
+                       <form method="POST" action="{{ url_for('confirm_ticket') }}">
+                            {% if decision_form %}
+                                {{ decision_form.hidden_tag() }}
+                            {% endif %}
+                            <div id="userDecision">
+                                {{ decision_form.submit(class="btn acceptbtn") }}  <!-- زر موافق -->
+                                {{ decision_form.reject(class="btn rejectbtn") }}  <!-- زر رفض -->
+                            </div>
+                        </form>
+
+
+                    </div>`;
+                } else {
+                    const errorContainer = document.getElementById('error-message');
+                    errorContainer.innerHTML = `
+            <div class="error-message">
+            <svg width="50px" height="50px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                    <g id="style=doutone">
+                        <g id="error-box">
+                            <path id="vector (Stroke)" fill-rule="evenodd" clip-rule="evenodd" d="M1.25 8C1.25 4.27208 4.27208 1.25 8 1.25H16C19.7279 1.25 22.75 4.27208 22.75 8V16C22.75 19.7279 19.7279 22.75 16 22.75H8C4.27208 22.75 1.25 19.7279 1.25 16V8ZM8 2.75C5.10051 2.75 2.75 5.10051 2.75 8V16C2.75 18.8995 5.10051 21.25 8 21.25H16C18.8995 21.25 21.25 18.8995 21.25 16V8C21.25 5.10051 18.8995 2.75 16 2.75H8Z" fill="#f00f0f"></path>
+                            <path id="vector (Stroke)_2" fill-rule="evenodd" clip-rule="evenodd" d="M8.46967 8.46967C8.76257 8.17678 9.23744 8.17678 9.53033 8.46967L15.5303 14.4697C15.8232 14.7626 15.8232 15.2374 15.5303 15.5303C15.2374 15.8232 14.7625 15.8232 14.4696 15.5303L8.46967 9.53033C8.17678 9.23743 8.17678 8.76256 8.46967 8.46967Z" fill="#fb7979"></path>
+                            <path id="vector (Stroke)_3" fill-rule="evenodd" clip-rule="evenodd" d="M15.5303 8.46967C15.8232 8.76257 15.8232 9.23744 15.5303 9.53033L9.53033 15.5303C9.23743 15.8232 8.76256 15.8232 8.46967 15.5303C8.17678 15.2374 8.17678 14.7625 8.46967 14.4696L14.4697 8.46967C14.7626 8.17678 15.2374 8.17678 15.5303 8.46967Z" fill="#fb7979"></path>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+            ${result.error}
+        </div>`;
+        errorContainer.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = `
+                <div>    
+                <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier"> <g id="style=doutone"> <g id="error-box"> <path id="vector (Stroke)" fill-rule="evenodd" clip-rule="evenodd" d="M1.25 8C1.25 4.27208 4.27208 1.25 8 1.25H16C19.7279 1.25 22.75 4.27208 22.75 8V16C22.75 19.7279 19.7279 22.75 16 22.75H8C4.27208 22.75 1.25 19.7279 1.25 16V8ZM8 2.75C5.10051 2.75 2.75 5.10051 2.75 8V16C2.75 18.8995 5.10051 21.25 8 21.25H16C18.8995 21.25 21.25 18.8995 21.25 16V8C21.25 5.10051 18.8995 2.75 16 2.75H8Z" fill="#f00f0f"></path> <path id="vector (Stroke)_2" fill-rule="evenodd" clip-rule="evenodd" 
+                    d="M8.46967 8.46967C8.76257 8.17678 9.23744 8.17678 9.53033 8.46967L15.5303 14.4697C15.8232 14.7626 15.8232 15.2374 15.5303 15.5303C15.2374 15.8232 14.7625 15.8232 14.4696 15.5303L8.46967 9.53033C8.17678 9.23743 8.17678 8.76256 8.46967 8.46967Z" fill="#fb7979"></path> <path id="vector (Stroke)_3" fill-rule="evenodd" clip-rule="evenodd" d="M15.5303 8.46967C15.8232 8.76257 15.8232 9.23744 15.5303 9.53033L9.53033 15.5303C9.23743 15.8232 8.76256 15.8232 8.46967 15.5303C8.17678 15.2374 8.17678 14.7625 8.46967 14.4696L14.4697 8.46967C14.7626 8.17678 15.2374 8.17678 15.5303 8.46967Z" fill="#fb7979"></path> </g> </g> </g></svg>
+                    </div> 
+                    حدث خطأ أثناء إرسال الشكوى. حاول مرة أخرى.
+                    ` ;
+                errorContainer.style.display = 'block';
+            }
+        }
+
+
+
+        
+    </script>
+    {% endblock content %}

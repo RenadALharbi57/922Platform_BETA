@@ -1,3 +1,9 @@
 {
-    "livePreview.defaultPreviewPath": "/Tamplets.html"
+    "cSpell.words": [
+        "jsonify",
+        "prepar",
+        "removenonarabic",
+        "sessionmaker",
+        "stopwordremoval"
+    ]
 }

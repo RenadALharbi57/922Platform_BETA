@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="overlayBackground" class="mainbody overlay-background">
+    <div class="fileticketform">
+
+    <div class="headerservic" id="TicketdetailTitle"> تفاصيل التذكرة</div>
+
+    <div class="TicketDetailscontainer">   
+    <div class="ticket-details"> 
+    <div class="ticket-header">
+    <p><strong class="ticket-headerSub">رقم التذكرة:</strong> {{ ticket.id }}</p>
+    <p><strong class="ticket-headerSub" >حالة التذكرة:</strong> {{ ticket.status }}</p>    
+    <p><strong class="ticket-headerSub" >التاريخ:</strong> {{ ticket.created_at }}</p>
+    </div>
+    
+    <p><strong class="ticket-headerSub">الجهة:</strong> {{ ticket.authority }}</p>
+    <p><strong class="ticket-headerSub">النص:</strong> {{ ticket.complaint_text }}</p>
+    <p><strong class="ticket-headerSub" >رد {{ ticket.authority }}:</strong> {{ ticket.Replay_text }}</p>
+
+</div>
+</div>
+
+</div>
+</div>
+{% endblock content %}

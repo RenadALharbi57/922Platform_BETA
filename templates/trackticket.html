@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="error-message" class="error-message" style="display: none;"></div>
+
+<div id="overlayBackground" class="mainbody overlay-background">
+    <div class="fileticketform">
+        <div class="headerservic">تتبع التذاكر</div>
+
+        <div class="section-title">البحث:</div>
+        <form method="POST" action="{{ url_for('track_ticket') }}">
+            <div class="search-section">
+                <div>
+                    <label for="ticket-number">رقم التذكرة:</label>
+                    <input type="text" class="input-box" id="ticket-number" name="ticket_number">
+                </div>
+                <div>
+                    <label for="ticket-status">حالة التذكرة:</label>
+                    <input type="text" class="input-box" id="ticket-status" name="ticket_status">
+                </div>
+                <div>
+                    <label for="agency">الجهة:</label>
+                    <input type="text" class="input-box" id="agency" name="agency">
+                </div>
+                <div>
+                    <button type="submit" class="btn search-button">بحث</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="section-title">التذاكر</div>
+            <div class="tableContener">
+                <table class="track_ticketTable">
+                    <thead>
+                    <tr>
+                        <th>رقم التذكرة</th>
+                        <th>الجهة</th>
+                        <th>حالة التذكرة</th>
+                        <th>عرض التفاصيل</th>
+                    </tr>
+                    </thead>
+                <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td class="ticketId"><div class="ticket-item">{{ ticket.id }}</div></td>
+                    <td class="ticketAuthority"><div class="ticket-item">{{ ticket.authority }}</div></td>
+                    <td class="ticketStatus" ><div class="ticket-item">{{ ticket.status }}</div></td>
+                    <td>
+                        <a href="{{ url_for('ticket_details', ticket_id=ticket.id) }}" class=" details-button">عرض التفاصيل</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+            </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, url_for, redirect
+from flask import Flask, request, jsonify, render_template, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -7,13 +7,14 @@ from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
 from flask_bcrypt import Bcrypt
 from sqlalchemy.orm import sessionmaker
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
-from forms import LoginForm,RegisterForm,Decision
+from Python.forms import LoginForm,RegisterForm,Decision
 from flask_migrate import Migrate
 from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_migrate import Migrate
 import traceback
 from flask import session
-from prepar import remove_repeating_char, remove_symbols, removenonarabic, give_emoji_free_Ticket, stopwordremoval ,normalize ,remove_spaces_arabic,remove_numbers 
+from Python.prepar import remove_repeating_char, remove_symbols, removenonarabic, give_emoji_free_Ticket, stopwordremoval ,normalize ,remove_spaces_arabic,remove_numbers 
+from Python.Validate import validate_email , validate_phone_number ,validate_complaint
 import pandas as pd
 import dill
 import torch
@@ -67,9 +68,13 @@ class Ticket(db.Model):
     complaint_text = db.Column(db.Text, nullable=False)
     authority = db.Column(db.String(100), nullable=False)
     severity = db.Column(db.String(20), nullable=False)
+    specialization = db.Column(db.String(100), nullable=False)
     region = db.Column(db.String(50), nullable=True)
+    email = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(10), nullable=False)
     city = db.Column(db.String(50), nullable=True)
-    status = db.Column(db.String(20), default="Pending")  # الحالة الافتراضية للتذكرة
+    status = db.Column(db.String(20), default="جديدة")  # Defult state 
+    Replay_text = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.now())
 
 
@@ -83,11 +88,11 @@ def load_user(user_id):
 
 migrate = Migrate(app, db)
 
-try:
-    tokenizer = AutoTokenizer.from_pretrained('Balanced-MARBERT')
-    model = AutoModelForSequenceClassification.from_pretrained('Balanced-MARBERT')
-except Exception as e:
-    print("Error loading Balanced-MARBERT model or tokenizer:", e)
+# try:
+#     Matokenizer = AutoTokenizer.from_pretrained('Balanced-MARBERT')
+#     Mamodel = AutoModelForSequenceClassification.from_pretrained('Balanced-MARBERT')
+# except Exception as e:
+#     print("Error loading Balanced-MARBERT model or tokenizer:", e)
 
     
 # Load model and tokenizer
@@ -108,12 +113,9 @@ import pickle
 import torch
 from transformers import AutoTokenizer
 
-# Path to the saved model file
-saved_model_path = 'Model/arabert_model_with_tokenizer.pkl'
-
 try:
     # Load the model and tokenizer from the pickle file
-    with open(saved_model_path, 'rb') as file:
+    with open('Model/arabert_model_with_tokenizer.pkl', 'rb') as file:
         data = pickle.load(file)
         model_ara = data['model']  # Load the model
         tokenizer_ara = data['tokenizer']  # Load the tokenizer
@@ -156,25 +158,14 @@ except Exception as e:
 # إعداد النصوص
 def preparedatasets(Ticket):
     if pd.notna(Ticket):  # التأكد من أن النص ليس NaN
-        print("Original:", Ticket)
         Ticket = normalize(Ticket)  # توحيد النصوص
-        print("Normalized:", Ticket)
         Ticket = stopwordremoval(Ticket)  # إزالة الكلمات التوقف
-        print("Stopwords Removed:", Ticket)
         Ticket = give_emoji_free_Ticket(Ticket)  # إزالة الرموز التعبيرية
-        print("Emojis Removed:", Ticket)
         Ticket = removenonarabic(Ticket)  # إزالة الأحرف غير العربية
-        print("Non-Arabic Removed:", Ticket)
         Ticket = remove_symbols(Ticket)  # إزالة الرموز
-        print("Symbols Removed:", Ticket)
         Ticket = remove_repeating_char(Ticket)   
-        print("Repeating Characters Removed:", Ticket)
         Ticket = remove_spaces_arabic(Ticket)
-        print("Spaces Removed:", Ticket)
         Ticket = remove_numbers(Ticket)
-        print("Numbers Removed:", Ticket)
-        # Ticket= apply_stemming(Ticket)
-        # print("Stemming ",apply_stemming(Ticket))
         return Ticket
 
 # Helper functions
@@ -191,7 +182,7 @@ def classify_authority(text):
     
     # Get the index of the predicted authority
     
-    logits = outputs.logits
+    outputs.logits
     authority_index = torch.argmax(outputs.logits, dim=1).item()
     
     authority_mapping = {
@@ -233,20 +224,30 @@ def determain_specialization(text):
         print("Error during specialization classification:", e)
         return "Unknown"
 
+
 # Routes# Routes
 @app.route('/predict', methods=['POST'])
 def predict():
+    
     try:
         # استلام البيانات من الطلب
         data = request.get_json()
         text = data.get('complaint', "").strip()
-        print("Text Received:", text)
+        email = data.get('email', "").strip()
+        phone_number = data.get('phone', "").strip()
 
-        # التحقق من أن النص غير فارغ وطوله كافٍ
-        if not text or len(text) < 10:
-            return jsonify({'error': 'نص الشكوى يجب أن يحتوي على 10 أحرف على الأقل.'}), 400
-        if not re.match(r'^[\u0600-\u06FF\s\d]+$', text) or text.isdigit():
-            return jsonify({'error': 'الرجاء استخدام الحروف العربية فقط.'}), 400
+
+        print("Complaint:", text)
+        print("Email:", email)
+        print("Phone:", phone_number)
+        
+        try:
+            validate_email(email)
+            validate_phone_number(phone_number)
+            validate_complaint(text)
+        except ValueError as ve:
+            return jsonify({'error': str(ve)}), 400
+        
         
         
         # تجهيز النصوص وتحليلها
@@ -264,15 +265,19 @@ def predict():
             'predicted_specialization': predicted_specialization,
             'region': current_user.region,
             'city': current_user.city,
+            'email': email,
+            'phone': phone_number,
             'user_id': current_user.id
         }
+        
+        print("Data stored in session:", session['new_ticket_data'])
 
         return jsonify({
             "authority": predicted_authority,
             "severity": predicted_severity,
             "specialization": predicted_specialization,
-            "message": "تم معالجة النص. الرجاء الموافقة لرفع التذكرة."
         })
+        
 
 
     except Exception as e:
@@ -283,30 +288,40 @@ def predict():
 @app.route('/confirm_ticket', methods=['POST'])
 @login_required
 def confirm_ticket():
-    try:
-        ticket_data = session.get('new_ticket_data')
+    decision_form = Decision()
 
-        if not ticket_data:
-            return jsonify({'error': 'لا توجد بيانات تذكرة لتأكيدها.'}), 400
+    if decision_form.validate_on_submit():
+        if decision_form.submit.data:  # إذا تم النقر على "موافق"
+            ticket_data = session.get('new_ticket_data')
+            if not ticket_data:
+                flash('لا توجد بيانات تذكرة لتأكيدها.', 'danger')
+                return redirect(url_for('fileticketPage'))
 
-        new_ticket = Ticket(
-            user_id=ticket_data['user_id'],
-            complaint_text=ticket_data['complaint_text'],
-            authority=ticket_data['predicted_authority'],
-            severity=ticket_data['predicted_severity'],
-            region=ticket_data['region'],
-            city=ticket_data['city']
-        )
-        db.session.add(new_ticket)
-        db.session.commit()
+            new_ticket = Ticket(
+                user_id=ticket_data['user_id'],
+                complaint_text=ticket_data['complaint_text'],
+                authority=ticket_data['predicted_authority'],
+                severity=ticket_data['predicted_severity'],
+                specialization=ticket_data['predicted_specialization'],
+                email=ticket_data['email'],
+                phone=ticket_data['phone'],
+                region=ticket_data['region'],
+                city=ticket_data['city']
+            )
+            db.session.add(new_ticket)
+            db.session.commit()
+            session.pop('new_ticket_data', None)
+            flash('تم تأكيد التذكرة بنجاح. يمكنك الآن تتبعها.', 'success')
+            return redirect(url_for('fileticketPage'))
 
-        session.pop('new_ticket_data', None)
+        elif decision_form.reject.data:  # إذا تم النقر على "رفض"
+            session.pop('new_ticket_data', None)  # حذف البيانات
+            flash('تم رفض التذكرة.', 'info')
+            return redirect(url_for('fileticketPage'))
 
-        return jsonify({'message': 'تم رفع التذكرة بنجاح.'})
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": "حدث خطأ أثناء تأكيد التذكرة.", "details": str(e)}), 500
-    
+    flash('حدث خطأ أثناء معالجة القرار.', 'danger')
+    return redirect(url_for('fileticketPage'))
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     login_form = LoginForm()
@@ -318,10 +333,12 @@ def home():
             login_user(user)
             return redirect(url_for('homepage'))
         else:
-            print("بيانات تسجيل الدخول غير صحيحة.", "danger")
+            flash('بيانات تسجيل الدخول غير صحيحة.', 'danger')
 
     if register_form.validate_on_submit():
-        try:
+        if register_form.password.data != register_form.confirm_password.data:
+            flash('كلمة المرور وتأكيدها لا يتطابقان.', 'danger')
+        else:
             hashed_password = bcrypt.generate_password_hash(register_form.password.data).decode('utf-8')
             new_user = User(
                 first_name=register_form.first_name.data,
@@ -330,16 +347,12 @@ def home():
                 password=hashed_password,
                 mobile_number=register_form.mobile_number.data,
                 region=register_form.region.data,
-                city=register_form.city.data
+                city=register_form.city.data,
             )
             db.session.add(new_user)
             db.session.commit()
-            print("تم إنشاء الحساب بنجاح.", "success")
+            flash('تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.', 'success')
             return redirect(url_for('home'))
-
-        except Exception as e:
-            traceback.print_exc()
-            print("حدث خطأ أثناء إنشاء الحساب.", "danger")
 
     return render_template('LoginSingupPage.html', login_form=login_form, register_form=register_form)
 
@@ -367,15 +380,26 @@ def track_ticket():
         ticket_status = request.form.get('ticket_status')
         agency = request.form.get('agency')
 
-        # بناء الاستعلام بناءً على المدخلات"message": "تم معالجة النص. الرجاء الموافقة لرفع التذكرة."
         query = Ticket.query.filter(Ticket.user_id == current_user.id)  # قصر البحث على المستخدم الحالي
+        errors = []
+        if not ticket_number:
+            errors.append("رقم التذكرة مطلوب.")
+        elif not ticket_number.isdigit():
+            errors.append("رقم التذكرة يجب أن يحتوي على أرقام فقط.")
+            
         if ticket_number:
             query = query.filter(Ticket.id == ticket_number)
+            
+        if not ticket_status.isalpha():
+            errors.append("حالة التذكرة يجب أن تحتوي على أحرف فقط.")
+
         if ticket_status:
             query = query.filter(Ticket.status.ilike(f"%{ticket_status}%"))
         if agency:
             query = query.filter(Ticket.authority.ilike(f"%{agency}%"))
-
+        if errors:
+            for error in errors:
+                print(error, 'error')
         # تنفيذ الاستعلام
         tickets = query.all()
 
@@ -400,24 +424,37 @@ def homepage():
     }
     return render_template('Homepage.html', user_data=user_data)
 
-@app.route('/fileTicketPage',methods=['GET', 'POST'])
+@app.route('/fileTicketPage', methods=['GET', 'POST'])
+@login_required
 def fileticketPage():
+    try:
+        # بيانات المستخدم
+        user_data = {
+            "first_name": current_user.first_name,
+            "last_name": current_user.last_name,
+            "id_number": current_user.id_number,
+            "mobile_number": current_user.mobile_number,
+            "region": current_user.region,
+            "city": current_user.city,
+        }
+        
+        # إنشاء نموذج القرار
+        decision_form = Decision()
+        
+        if request.method == 'POST':
+            # عند تقديم الطلب POST
+            flash('تم إنشاء التذكرة بنجاح. يمكنك الآن تتبع التذكرة في الصفحة المخصصة.', 'success')
+            return render_template('fileticket.html', user_data=user_data, decision_form=decision_form)
+
+        # عند الطلب GET
+        return render_template('fileticket.html', user_data=user_data, decision_form=decision_form)
     
-    if request.method == 'POST':
-        # معالجة طلب POST (إذا لزم الأمر)
-        return jsonify({"message": "تم استقبال الطلب بنجاح."})
-    
-    
-    user_data = {
-        "first_name": current_user.first_name,
-        "last_name": current_user.last_name,
-        "id_number": current_user.id_number,
-        "mobile_number": current_user.mobile_number,
-        "region": current_user.region,
-        "city": current_user.city,
-    }
-    decision_form = Decision()
-    return render_template('fileticket.html', user_data=user_data, decision_form=decision_form)
+    except Exception as e:
+        traceback.print_exc()
+        flash('حدث خطأ أثناء معالجة الصفحة.', 'danger')
+        print('حدث خطأ أثناء معالجة الصفحة.')
+        return redirect(url_for('homepage'))
+
 
 if __name__ == '__main__':
     with app.app_context():
